@@ -1,0 +1,67 @@
+body {
+    background-color: white;
+    color: blue;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+#chatbox {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    background-color: #f0f0f0;  /* Grayish background for the box */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+#messages {
+    overflow-y: auto;
+    max-height: 500px;
+}
+input[type="text"], button {
+    padding: 10px;
+    margin-top: 10px;
+}
+input[type="text"] {
+    width: calc(100% - 22px);
+    border: 1px solid blue;
+}
+button {
+    width: 100%;
+    background-color: blue;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.recipe-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 0;
+}
+.recipe-content {
+    font-size: 16px;
+}
+
+
+
+/* LOADING CIRCLE */
+
+.loader {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid blue; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

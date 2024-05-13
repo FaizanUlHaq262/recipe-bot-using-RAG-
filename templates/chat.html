@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <img src="../static/logo.png" class="logo" style="width: 500px; height: 500px;">
+    <div id="chatbox">
+        <div id="messages"></div>
+        <div id="loader" class="loader" style="display: none;"></div>
+        <input type="text" id="userinput" placeholder="Type...." autofocus>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+        <!-- making a list of commands -->
+        <h2 class="recipe-title"></h2>
+        <div class="recipe-content">
+            <li style="font-size: 20px;"><strong>/recipe</strong> &lt;food name&gt; - Get a recipe for a specific dish</li>
+            <li style="font-size: 20px;"><strong>/recommend</strong> &lt;ingredient names&gt; - Get recommendations for ingredients you have</li>
+            <li style="font-size: 20px;"><strong>/how</strong> - ask the bot how much something is needed</li>
+        </div>
+
+        
+        
+<!-- 
+    AUDIO CODE
+    <div id="tts-loader" class="loader" style="display: none;"></div>
+    <button id="play-tts" style="display: none;" onclick="playTextToSpeech()">Play Audio</button>
+     -->
+    <script>
+        function formatResponse(text) {
+            const lines = text.split("\n");
+            const title = lines.shift();  // Assume first line is the title
+            const formatted = [`<h2 class="recipe-title">${title}</h2>`];
+            formatted.push('<div class="recipe-content">');
+            lines.forEach(line => {
+                if (line.startsWith("-")) {
+                    formatted.push(`<li>${line}</li>`);
+                } else if (line.match(/^\d+\./)) {
+                    formatted.push(`<li>${line}</li>`);
+                } else {
+                    formatted.push(`<p>${line}</p>`);
+                }
+            });
+            formatted.push('</div>');
+            return formatted.join("");
+        }
+
+        function sendMessage() {
+            var input = document.getElementById("userinput");
+            var loader = document.getElementById("loader");
+            var messages = document.getElementById("messages");
+            loader.style.display = "block"; // Show loader
+            fetch("/ask", {
+                method: "POST",
+                body: new URLSearchParams("message=" + input.value),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                var message = document.createElement("div");
+                message.innerHTML = formatResponse(data.message);
+                messages.appendChild(message);
+                loader.style.display = "none"; // Hide loader when data is ready
+                document.getElementById('play-tts').style.display = 'block'; // Show the TTS button
+            });
+            input.value = "";
+        }
+
+        function playTextToSpeech() {
+            var text = document.querySelector('.recipe-content').innerText; // or another selector that captures the result text
+            var audio = new Audio();
+            var loader = document.getElementById('tts-loader');
+            var playButton = document.getElementById('play-tts');
+            loader.style.display = 'block';
+            playButton.style.display = 'none';
+            
+            fetch("/tts", {
+                method: "POST",
+                body: new URLSearchParams("text=" + text),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                var url = window.URL.createObjectURL(blob);
+                audio.src = url;
+                audio.play();
+                loader.style.display = 'none';
+                playButton.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
